@@ -1,0 +1,32 @@
+docker:
+  network: beebop_nw
+  prefix: beebop
+proxy:
+  host: localhost
+  port_http: 80
+  port_https: 443
+  image:
+    repo: mrcide
+    name: beebop-proxy
+    tag: bacpop-65
+server:
+  image:
+    repo: mrcide
+    name: beebop-server
+    tag: bacpop-65
+  port: 4000
+api:
+  image:
+    repo: mrcide
+    name: beebop-py
+    tag: main
+  db_location: ./storage/GPS_v4_references
+  storage_location: ./storage
+redis:
+  image:
+    name: redis
+    tag: "5.0"
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
