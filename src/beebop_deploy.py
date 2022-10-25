@@ -1,3 +1,5 @@
+import time
+
 import docker
 import json
 import constellation
@@ -126,16 +128,21 @@ def beebop_constellation(cfg):
     worker_env = {"REDIS_HOST": redis.name}
     worker_mounts = [constellation.ConstellationMount("storage",
                                                       "/beebop/storage")]
+    # Constellation starts containers on no network, then joins them to
+    # the network. So we get the container to sleep for 5s to allow for it
+    # to have joined the network by the time rqworker is called, otherwise
+    # it exits when it can't connect to redis
+    worker_args = ["-c", "sleep 5 && rqworker"]
     worker = constellation.ConstellationContainer(
-        "worker", cfg.worker_ref, environment=worker_env, mounts=worker_mounts,
-        args=["rqworker"])
+        "worker", cfg.worker_ref, environment=worker_env,
+        mounts=worker_mounts, entrypoint="sh", args=worker_args)
 
     # 5. proxy
     proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
     proxy = constellation.ConstellationContainer(
         "proxy", cfg.proxy_ref, ports=proxy_ports, configure=proxy_configure,
         args=[cfg.proxy_host,
-              api.name])
+              server.name])
 
     containers = [redis, server, api, proxy, worker]
 
@@ -182,6 +189,7 @@ def server_configure(api):
 
         docker_util.string_into_container(json.dumps(config), container,
                                           "/app/src/resources/config.json")
+
     return configure
 
 
