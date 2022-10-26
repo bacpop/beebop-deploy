@@ -7,10 +7,10 @@ Usage:
   ./beebop upgrade
 
 Options:
-  --pull                    Pull images before starting
-  --volumes                 Remove volumes (WARNING: irreversible data loss)
-  --network                 Remove network
-  --kill                    Kill the containers (faster, but possible db corruption)
+  --pull              Pull images before starting
+  --volumes           Remove volumes (WARNING: irreversible data loss)
+  --network           Remove network
+  --kill              Kill the containers (faster, but possible db corruption)
 """
 
 import docopt
@@ -54,7 +54,7 @@ def parse(argv=None):
     elif dat["upgrade"]:
         args = {}
         options = {}
-        action = "upgrade_all"
+        action = "upgrade"
     return path, config_name, action, args, options
 
 
@@ -100,7 +100,7 @@ def main(argv=None):
     path, config_name, action, args, options = parse(argv)
     config_name, cfg = load_config(path, config_name, options)
     obj = beebop_constellation(cfg)
-    if action == "upgrade_all":
+    if action == "upgrade":
         obj.restart(pull_images=True)
     elif action == "start":
         save_config(path, config_name, cfg)

@@ -26,7 +26,7 @@ class BeebopConfig:
         }
 
         self.volumes = {
-            "storage": "storage"
+            "storage": "beebop_storage"
         }
 
         # redis

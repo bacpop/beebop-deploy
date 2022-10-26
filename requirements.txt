@@ -2,3 +2,4 @@ constellation==0.0.12
 docopt
 pytest
 timeago
+requests

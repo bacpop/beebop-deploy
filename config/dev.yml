@@ -13,3 +13,7 @@ redis:
   image:
     name: redis
     tag: "5.0"
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
