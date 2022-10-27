@@ -9,7 +9,3 @@ server:
     github:
       client_id: abcd
       secret: abcd
-redis:
-  image:
-    name: redis
-    tag: "5.0"

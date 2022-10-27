@@ -9,10 +9,6 @@ server:
     github:
       client_id: VAULT:secret/beebop/auth/github:clientid
       secret: VAULT:secret/beebop/auth/github:secret
-redis:
-  image:
-    name: redis
-    tag: "5.0"
 vault:
   addr: https://vault.dide.ic.ac.uk:8200
   auth:
