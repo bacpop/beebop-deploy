@@ -21,6 +21,7 @@ api:
     name: beebop-py
     tag: main
   db_location: ./storage/GPS_v4_references
+  use_small_db: true
   storage_location: ./storage
 redis:
   image:
