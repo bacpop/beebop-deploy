@@ -171,19 +171,23 @@ def redis_configure(container, cfg):
 
 def api_configure(container, cfg):
     if db_is_initialised(container, cfg):
-      print("[api] Storage db already exists, doing nothing")
+        print("[api] Storage db already exists, doing nothing")
     else:
-      print("[api] Downloading storage database")
-      args = ["./scripts/download_db"]
-      if cfg.api_use_small_db:
-          args = args + ["--small"]
-      args = args + ["storage"]
-      mounts = [docker.types.Mount("/beebop/storage", cfg.volumes["storage"])]
-      container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
-                                      remove=True)
+        print("[api] Downloading storage database")
+        args = ["./scripts/download_db"]
+        if cfg.api_use_small_db:
+            args = args + ["--small"]
+        args = args + ["storage"]
+        mounts = [docker.types.Mount("/beebop/storage",
+                  cfg.volumes["storage"])]
+        container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
+                                        remove=True)
+
 
 def db_is_initialised(container, cfg):
-    res = container.exec_run(["stat", os.path.join("/beebop/storage", cfg.api_db_name)])
+    res = container.exec_run(["stat",
+                              os.path.join("/beebop/storage",
+                                           cfg.api_db_name)])
     return res[0] == 0
 
 
