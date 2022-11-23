@@ -27,4 +27,5 @@ redis:
   image:
     name: redis
     tag: "5.0"
-
+worker:
+  count: 1
