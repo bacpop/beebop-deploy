@@ -8,18 +8,18 @@ proxy:
   image:
     repo: mrcide
     name: beebop-proxy
-    tag: bacpop-65
+    tag: main
 server:
   image:
     repo: mrcide
     name: beebop-server
-    tag: bacpop-65
+    tag: main
   port: 4000
 api:
   image:
     repo: mrcide
     name: beebop-py
-    tag: main
+    tag: 6491e9e
   db_location: ./storage/GPS_v4_references
   use_small_db: true
   storage_location: ./storage
