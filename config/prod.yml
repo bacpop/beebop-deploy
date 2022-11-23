@@ -1,0 +1,23 @@
+proxy:
+  host: beebop.dide.ic.ac.uk
+  ssl:
+    certificate: VAULT:secret/beebop/ssl:cert
+    key: VAULT:secret/beebop/ssl:key
+server:
+  client_url: https://beebop.dide.ic.ac.uk
+  server_url: https://beebop.dide.ic.ac.uk/api
+  auth:
+    google:
+      client_id: VAULT:secret/beebop/auth/production/google:clientid
+      secret: VAULT:secret/beebop/auth/production/google:secret
+    session_secret: VAULT:secret/beebop/express-session/production:secret
+    github:
+      client_id: VAULT:secret/beebop/auth/production/github:clientid
+      secret: VAULT:secret/beebop/auth/production/github:secret
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
+api:
+  db_location: ./storage/GPS_v4
+  use_small_db: false

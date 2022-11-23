@@ -1,0 +1,11 @@
+server:
+  client_url: https://localhost
+  server_url: https://localhost/api
+  auth:
+    google:
+      client_id: abcd
+      secret: abcd
+    session_secret: abcd
+    github:
+      client_id: abcd
+      secret: abcd

@@ -1,0 +1,15 @@
+server:
+  client_url: https://localhost
+  server_url: https://localhost/api
+  auth:
+    google:
+      client_id: VAULT:secret/beebop/auth/google:clientid
+      secret: VAULT:secret/beebop/auth/google:secret
+    session_secret: VAULT:secret/beebop/express-session:secret
+    github:
+      client_id: VAULT:secret/beebop/auth/github:clientid
+      secret: VAULT:secret/beebop/auth/github:secret
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
