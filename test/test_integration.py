@@ -29,8 +29,8 @@ def test_start_beebop():
     assert docker_util.container_exists("beebop_api")
     assert docker_util.container_exists("beebop_redis")
     assert docker_util.container_exists("beebop_server")
-    assert docker_util.container_exists("beebop_worker")
     assert docker_util.container_exists("beebop_proxy")
+    assert len(docker_util.containers_matching("beebop_worker_", False)) == 2
 
     obj.destroy()
 
@@ -41,3 +41,4 @@ def test_start_beebop():
     assert not docker_util.container_exists("beebop_server")
     assert not docker_util.container_exists("beebop_worker")
     assert not docker_util.container_exists("beebop_proxy")
+    assert len(docker_util.containers_matching("beebop_worker_", False)) == 0
