@@ -8,12 +8,12 @@ proxy:
   image:
     repo: mrcide
     name: beebop-proxy
-    tag: bacpop-65
+    tag: main
 server:
   image:
     repo: mrcide
     name: beebop-server
-    tag: bacpop-65
+    tag: main
   port: 4000
 api:
   image:
@@ -27,4 +27,5 @@ redis:
   image:
     name: redis
     tag: "5.0"
-
+worker:
+  count: 1

@@ -1,4 +1,5 @@
 import time
+import os
 
 import docker
 import json
@@ -99,12 +100,14 @@ class BeebopConfig:
             dat, ["api", "storage_location"])
         self.api_db_location = config.config_string(
             dat, ["api", "db_location"])
+        self.api_db_name = os.path.basename(self.api_db_location)
         self.api_use_small_db = config.config_boolean(
             dat, ["api", "use_small_db"])
 
         # worker and api always the same image
         self.worker_ref = constellation.ImageReference(
             api_repo, api_name, api_tag)
+        self.worker_count = config.config_integer(dat, ["worker", "count"])
 
 
 def beebop_constellation(cfg):
@@ -135,8 +138,8 @@ def beebop_constellation(cfg):
     # to have joined the network by the time rqworker is called, otherwise
     # it exits when it can't connect to redis
     worker_args = ["-c", "sleep 5 && rqworker"]
-    worker = constellation.ConstellationContainer(
-        "worker", cfg.worker_ref, environment=worker_env,
+    worker = constellation.ConstellationService(
+        "worker", cfg.worker_ref, cfg.worker_count, environment=worker_env,
         mounts=worker_mounts, entrypoint="sh", args=worker_args)
 
     # 5. proxy
@@ -167,14 +170,25 @@ def redis_configure(container, cfg):
 
 
 def api_configure(container, cfg):
-    print("[api] Downloading storage database")
-    args = ["./scripts/download_db"]
-    if cfg.api_use_small_db:
-        args = args + ["--small"]
-    args = args + ["storage"]
-    mounts = [docker.types.Mount("/beebop/storage", cfg.volumes["storage"])]
-    container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
-                                    remove=True)
+    if db_is_initialised(container, cfg):
+        print("[api] Storage db already exists, doing nothing")
+    else:
+        print("[api] Downloading storage database")
+        args = ["./scripts/download_db"]
+        if cfg.api_use_small_db:
+            args = args + ["--small"]
+        args = args + ["storage"]
+        mounts = [docker.types.Mount("/beebop/storage",
+                  cfg.volumes["storage"])]
+        container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
+                                        remove=True)
+
+
+def db_is_initialised(container, cfg):
+    res = container.exec_run(["stat",
+                              os.path.join("/beebop/storage",
+                                           cfg.api_db_name)])
+    return res[0] == 0
 
 
 def server_configure(api):

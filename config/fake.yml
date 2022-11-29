@@ -9,3 +9,5 @@ server:
     github:
       client_id: abcd
       secret: abcd
+worker:
+  count: 2
