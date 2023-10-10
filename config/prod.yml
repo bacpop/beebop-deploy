@@ -19,7 +19,7 @@ vault:
   auth:
     method: github
 api:
-  db_location: ./storage/GPS_v4
+  db_location: ./storage/GPS_v6
   use_small_db: false
 worker:
   count: 5

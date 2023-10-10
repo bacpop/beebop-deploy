@@ -20,7 +20,7 @@ api:
     repo: mrcide
     name: beebop-py
     tag: main
-  db_location: ./storage/GPS_v4_references
+  db_location: ./storage/GPS_v6_references
   use_small_db: true
   storage_location: ./storage
 redis:
