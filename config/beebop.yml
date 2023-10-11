@@ -13,13 +13,13 @@ server:
   image:
     repo: mrcide
     name: beebop-server
-    tag: main
+    tag: bacpop-25
   port: 4000
 api:
   image:
     repo: mrcide
     name: beebop-py
-    tag: main
+    tag: bacpop-25
   db_location: ./storage/GPS_v6_references
   use_small_db: true
   storage_location: ./storage
