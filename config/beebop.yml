@@ -13,8 +13,9 @@ server:
   image:
     repo: mrcide
     name: beebop-server
-    tag: bacpop-25
+    tag: bacpop-145
   port: 4000
+  redis_url: "redis://beebop-redis:6379"
 api:
   image:
     repo: mrcide
