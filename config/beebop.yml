@@ -19,7 +19,7 @@ api:
   image:
     repo: mrcide
     name: beebop-py
-    tag: bacpop-25
+    tag: main
   db_location: ./storage/GPS_v6_references
   use_small_db: true
   storage_location: ./storage
