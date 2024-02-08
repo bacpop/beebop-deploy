@@ -1,0 +1,15 @@
+server:
+  client_url: https://beebop-dev.dide.ic.ac.uk
+  server_url: https://beebop-dev.dide.ic.ac.uk/api
+  auth:
+    google:
+      client_id: VAULT:secret/beebop/auth/staging/google:clientid
+      secret: VAULT:secret/beebop/auth/staging/google:secret
+    session_secret: VAULT:secret/beebop/express-session:secret
+    github:
+      client_id: VAULT:secret/beebop/auth/staging/github:clientid
+      secret: VAULT:secret/beebop/auth/staging/github:secret
+vault:
+  addr: https://vault.dide.ic.ac.uk:8200
+  auth:
+    method: github
