@@ -1,3 +1,8 @@
+proxy:
+  host: beebop-dev.dide.ic.ac.uk
+  ssl:
+    certificate: VAULT:secret/beebop/ssl/staging:cert
+    key: VAULT:secret/beebop/ssl/staging:key
 server:
   client_url: https://beebop-dev.dide.ic.ac.uk
   server_url: https://beebop-dev.dide.ic.ac.uk/api
