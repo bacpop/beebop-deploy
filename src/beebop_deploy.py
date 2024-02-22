@@ -76,6 +76,7 @@ class BeebopConfig:
         self.server_port = config.config_integer(dat, ["server", "port"])
         self.client_url = config.config_string(dat, ["server", "client_url"])
         self.server_url = config.config_string(dat, ["server", "server_url"])
+        self.redis_url = config.config_string(dat, ["server", "redis_url"])
         self.google_client_id = config.config_string(
             dat, ["server", "auth", "google", "client_id"])
         self.google_client_secret = config.config_string(
@@ -199,6 +200,7 @@ def server_configure(api):
             "api_url": "http://{}:5000".format(api.name),
             "client_url": cfg.client_url,
             "server_url": cfg.server_url,
+            "redis_url": cfg.redis_url,
             "GOOGLE_CLIENT_ID": cfg.google_client_id,
             "GOOGLE_CLIENT_SECRET": cfg.google_client_secret,
             "GITHUB_CLIENT_ID": cfg.github_client_id,

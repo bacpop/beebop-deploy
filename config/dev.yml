@@ -3,12 +3,12 @@ server:
   server_url: https://localhost/api
   auth:
     google:
-      client_id: VAULT:secret/beebop/auth/google:clientid
-      secret: VAULT:secret/beebop/auth/google:secret
+      client_id: VAULT:secret/beebop/auth/devdocker/google:clientid
+      secret: VAULT:secret/beebop/auth/devdocker/google:secret
     session_secret: VAULT:secret/beebop/express-session:secret
     github:
-      client_id: VAULT:secret/beebop/auth/github:clientid
-      secret: VAULT:secret/beebop/auth/github:secret
+      client_id: VAULT:secret/beebop/auth/devdocker/github:clientid
+      secret: VAULT:secret/beebop/auth/devdocker/github:secret
 vault:
   addr: https://vault.dide.ic.ac.uk:8200
   auth:

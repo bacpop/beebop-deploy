@@ -15,12 +15,13 @@ server:
     name: beebop-server
     tag: main
   port: 4000
+  redis_url: "redis://beebop-redis:6379"
 api:
   image:
     repo: mrcide
     name: beebop-py
     tag: main
-  db_location: ./storage/GPS_v4_references
+  db_location: ./storage/GPS_v6_references
   use_small_db: true
   storage_location: ./storage
 redis:
