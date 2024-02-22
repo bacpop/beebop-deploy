@@ -1,4 +1,14 @@
-on: push
+on:
+  push:
+    branches:
+      - main
+      - master
+      - "bacpop-*"
+  pull_request:
+    branches:
+      - main
+      - master
+      - "bacpop-*"
 
 name: Tests
 
