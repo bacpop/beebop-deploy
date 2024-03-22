@@ -20,7 +20,8 @@ api:
   image:
     repo: mrcide
     name: beebop-py
-    tag: main
+    # TODO: change back to main before merge
+    tag: bacpop-159-use-v8
   db_location: ./storage/GPS_v8_ref
   storage_location: ./storage
 redis:
