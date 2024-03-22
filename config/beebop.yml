@@ -8,12 +8,14 @@ proxy:
   image:
     repo: mrcide
     name: beebop-proxy
-    tag: main
+    # TODO: change back to main before merge
+    tag: bacpop-159-v8-db
 server:
   image:
     repo: mrcide
     name: beebop-server
-    tag: main
+    # TODO: change back to main before merge
+    tag: bacpop-159-v8-db
   port: 4000
   redis_url: "redis://beebop-redis:6379"
 api:
