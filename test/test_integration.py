@@ -14,6 +14,14 @@ def test_start_beebop():
     obj.status()
     obj.start()
 
+    assert docker_util.network_exists("beebop_nw")
+    assert docker_util.volume_exists("beebop_storage")
+    assert docker_util.container_exists("beebop-api")
+    assert docker_util.container_exists("beebop-redis")
+    assert docker_util.container_exists("beebop-server")
+    assert docker_util.container_exists("beebop-proxy")
+    assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
+
     # ignore SSL
     session = requests.Session()
     session.verify = False
@@ -23,14 +31,6 @@ def test_start_beebop():
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
-
-    assert docker_util.network_exists("beebop_nw")
-    assert docker_util.volume_exists("beebop_storage")
-    assert docker_util.container_exists("beebop-api")
-    assert docker_util.container_exists("beebop-redis")
-    assert docker_util.container_exists("beebop-server")
-    assert docker_util.container_exists("beebop-proxy")
-    assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
     obj.destroy()
 
