@@ -102,8 +102,6 @@ class BeebopConfig:
         self.api_db_location = config.config_string(
             dat, ["api", "db_location"])
         self.api_db_name = os.path.basename(self.api_db_location)
-        self.api_use_small_db = config.config_boolean(
-            dat, ["api", "use_small_db"])
 
         # worker and api always the same image
         self.worker_ref = constellation.ImageReference(
@@ -176,9 +174,6 @@ def api_configure(container, cfg):
     else:
         print("[api] Downloading storage database")
         args = ["./scripts/download_db"]
-        if cfg.api_use_small_db:
-            args = args + ["--small"]
-        args = args + ["storage"]
         mounts = [docker.types.Mount("/beebop/storage",
                   cfg.volumes["storage"])]
         container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
