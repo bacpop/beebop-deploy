@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beebop-deploy-redis
+  labels:
+    app: beebop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beebop-redis
+  template:
+    metadata:
+      labels:
+        app: beebop-redis
+    spec:
+      containers:
+        - name: beebop-redis
+          image: redis
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beebop-deploy-server
+  labels:
+    app: beebop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beebop-server
+  template:
+    metadata:
+      labels:
+        app: beebop-server
+    spec:
+      initContainers:
+        - name: wait-for-redis
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup beebop-redis-svc.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done",
+            ]
+      containers:
+        - name: beebop-server
+          image: mrcide/beebop-server:test-k8s
+          env:
+            - name: REDIS_URL
+              value: redis://beebop-redis:6379
+            - name: SERVER_PORT
+              value: "4000"
+            - name: API_URL
+              value: https://beebop-py-api-svc:5000
+            - name: CLIENT_URL
+              value: https://beebop-dev.dide.ic.ac.uk
+            - name: SERVER_URL
+              value: https://beebop-dev.dide.ic.ac.uk/api
+            - name: GOOGLE_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: googleClientId
+            - name: GOOGLE_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: googleClientSecret
+            - name: GITHUB_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: githubClientId
+            - name: GITHUB_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: githubClientSecret
+            - name: SESSION_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: auth-secrets
+                  key: sessionSecret
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beebop-deploy-py-api
+  labels:
+    app: beebop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beebop-py-api
+  template:
+    metadata:
+      labels:
+        app: beebop-py-api
+    spec:
+      initContainers:
+        - name: init-storage
+          image: mrcide/beebop-py:main
+          command: ["sh", "-c", "./scripts/download_db"]
+          volumeMounts:
+            - name: beebop-storage
+              mountPath: /beebop/storage
+        - name: wait-for-redis
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup beebop-redis-svc.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done",
+            ]
+      containers:
+        - name: beebop-py-api
+          image: mrcide/beebop-py:main
+          env:
+            - name: REDIS_HOST
+              value: beebop-redis-svc
+            - name: STORAGE_LOCATION
+              value: ./storage
+            - name: DB_LOCATION
+              value: ./storage/GPS_v8_ref
+          volumeMounts:
+            - name: beebop-storage
+              mountPath: /beebop/storage
+      volumes:
+        - name: beebop-storage
+          persistentVolumeClaim:
+            claimName: beebop-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beebop-deploy-py-worker
+  labels:
+    app: beebop
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: beebop-py-worker
+  template:
+    metadata:
+      labels:
+        app: beebop-py-worker
+    spec:
+      initContainers:
+        - name: wait-for-redis
+          image: busybox
+          command:
+            [
+              "sh",
+              "-c",
+              "until nslookup beebop-redis-svc.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for mydb; sleep 2; done",
+            ]
+      containers:
+        - name: beebop-py-worker
+          image: mrcide/beebop-py:main
+          command: ["rqworker"]
+          env:
+            - name: REDIS_HOST
+              value: beebop-redis-svc
+          volumeMounts:
+            - name: beebop-storage
+              mountPath: /beebop/storage
+      volumes:
+        - name: beebop-storage
+          persistentVolumeClaim:
+            claimName: beebop-pvc
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: beebop-deploy-client
+  labels:
+    app: beebop
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: beebop-client
+  template:
+    metadata:
+      labels:
+        app: beebop-client
+    spec:
+      containers:
+        - name: beebop-client
+          image: mrcide/beebop-proxy:test-k8s

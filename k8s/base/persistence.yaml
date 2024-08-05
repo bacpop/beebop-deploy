@@ -1,0 +1,12 @@
+# todo: storage capacity as per requirements
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: beebop-pvc
+spec:
+  storageClassName: local-path 
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 15Gi

@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+set -eu
+# example use case: ./start-k8s-shiny production
+# Set the environment variable to the first command-line argument or default to 'testing'
+ENV=${1:-dev}
+if [[ "$ENV" != "dev" && "$ENV" != "production" ]]; then
+    echo "Error: env must be either 'dev' or 'production'"
+    exit 1
+fi
+# Make the script itself executable
+chmod +x "$0"
+
+# Make the k8s directory and its contents executable
+chmod +x k8s/
+
+# Create a Kubernetes namespace named 'beebop' if not exists
+kubectl create namespace beebop --dry-run=client -o yaml | kubectl apply -f -
+
+# Run the script to configure SSL (assuming it's in the k8s directory)
+k8s/configure_ssl ||  { echo "Error: Failed to configure SSL"; exit 1; }
+
+# Run the script to configure secrets (assuming it's in the k8s directory)
+k8s/configure_secrets ||  { echo "Error: Failed to configure secrets"; exit 1; }
+
+# Apply Kubernetes manifests from overlays based on the specified or default environment
+kubectl apply -k "k8s/overlays/$ENV"
+
+# Wait for the 'shiny-deploy' deployment to be in the 'available' condition within the 'twinkle' namespace
+echo 'Waiting for pods to be ready...'
+kubectl wait -n beebop --for=condition=available --timeout=300s deployment/beebop-deploy-py-api
