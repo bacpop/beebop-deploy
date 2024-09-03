@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: beebop-deploy-redis
   labels:
-    app: beebop
+    app: beebop-redis
 spec:
   replicas: 1
   selector:
@@ -17,13 +17,14 @@ spec:
       containers:
         - name: beebop-redis
           image: redis
+          imagePullPolicy: Always
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: beebop-deploy-server
   labels:
-    app: beebop
+    app: beebop-server
 spec:
   replicas: 1
   selector:
@@ -46,13 +47,14 @@ spec:
       containers:
         - name: beebop-server
           image: mrcide/beebop-server:test-k8s
+          imagePullPolicy: Always
           env:
             - name: REDIS_URL
-              value: redis://beebop-redis:6379
+              value: redis://beebop-redis-svc:6379
             - name: SERVER_PORT
               value: "4000"
             - name: API_URL
-              value: https://beebop-py-api-svc:5000
+              value: http://beebop-py-api-svc:5000
             - name: CLIENT_URL
               value: https://beebop-dev.dide.ic.ac.uk
             - name: SERVER_URL
@@ -88,7 +90,7 @@ kind: Deployment
 metadata:
   name: beebop-deploy-py-api
   labels:
-    app: beebop
+    app: beebop-py-api
 spec:
   replicas: 1
   selector:
@@ -102,12 +104,14 @@ spec:
       initContainers:
         - name: init-storage
           image: mrcide/beebop-py:main
+          imagePullPolicy: Always
           command: ["sh", "-c", "./scripts/download_db"]
           volumeMounts:
             - name: beebop-storage
               mountPath: /beebop/storage
         - name: wait-for-redis
           image: busybox
+          imagePullPolicy: Always
           command:
             [
               "sh",
@@ -117,6 +121,7 @@ spec:
       containers:
         - name: beebop-py-api
           image: mrcide/beebop-py:main
+          imagePullPolicy: Always
           env:
             - name: REDIS_HOST
               value: beebop-redis-svc
@@ -137,9 +142,9 @@ kind: Deployment
 metadata:
   name: beebop-deploy-py-worker
   labels:
-    app: beebop
+    app: beebop-py-worker
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: beebop-py-worker
@@ -151,6 +156,7 @@ spec:
       initContainers:
         - name: wait-for-redis
           image: busybox
+          imagePullPolicy: Always
           command:
             [
               "sh",
@@ -160,6 +166,7 @@ spec:
       containers:
         - name: beebop-py-worker
           image: mrcide/beebop-py:main
+          imagePullPolicy: Always
           command: ["rqworker"]
           env:
             - name: REDIS_HOST
@@ -177,7 +184,7 @@ kind: Deployment
 metadata:
   name: beebop-deploy-client
   labels:
-    app: beebop
+    app: beebop-client
 spec:
   replicas: 1
   selector:
@@ -191,3 +198,4 @@ spec:
       containers:
         - name: beebop-client
           image: mrcide/beebop-proxy:test-k8s
+          imagePullPolicy: Always
