@@ -5,15 +5,14 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/use-regex: "true"
     nginx.ingress.kubernetes.io/rewrite-target: /$1$2
-    nginx.ingress.kubernetes.io/proxy-body-size: "10000m"
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
-        - beebop-dev.dide.ic.ac.uk
+        - beebop.dide.ic.ac.uk
       secretName: tls-secret
   rules:
-    - host: beebop-dev.dide.ic.ac.uk
+    - host: beebop.dide.ic.ac.uk
       http:
         paths:
           - path: /api/(.*)

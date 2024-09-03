@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - ../../base
+
+replicas:
+  - count: 5
+    name: beebop-deploy-py-worker
+
+labels:
+  - includeSelectors: true
+    pairs:
+      env: prod
+patches:
+  - path: ingress-patch.yaml

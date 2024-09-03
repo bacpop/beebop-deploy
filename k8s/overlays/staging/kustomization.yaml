@@ -5,12 +5,12 @@ resources:
   - ../../base
 
 replicas:
-  - count: 3
+  - count: 2
     name: beebop-deploy-py-worker
 
 labels:
   - includeSelectors: true
     pairs:
-      env: dev
+      env: staging
 patches:
   - path: ingress-patch.yaml

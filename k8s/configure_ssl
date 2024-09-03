@@ -1,9 +1,7 @@
 #!/usr/bin/env bash
 # TODO: update to use vault k8s auth
-set -eu
 
-export VAULT_ADDR=https://vault.dide.ic.ac.uk:8200
-export VAULT_TOKEN=$(vault login -method=github -token-only)
+set -eu
 
 DEST=${PWD}/k8s/ssl
 mkdir -p $DEST 

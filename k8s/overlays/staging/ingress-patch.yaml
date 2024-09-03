@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-beebop
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$1$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - beebop-dev.dide.ic.ac.uk
+      secretName: tls-secret
+  rules:
+    - host: beebop-dev.dide.ic.ac.uk
+      http:
+        paths:
+          - path: /api/(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: beebop-server-svc
+                port:
+                  number: 4000
+          - path: /()(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: beebop-client-svc
+                port:
+                  number: 3000
