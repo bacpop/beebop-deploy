@@ -9,9 +9,6 @@ fi
 DEST=${PWD}/k8s/ssl
 mkdir -p $DEST 
 
-vault read -field=cert /secret/beebop/ssl/$ENV > \
-      ${DEST}/certificate.pem
-vault read -field=key /secret/beebop/ssl/$ENV > \
-      ${DEST}/key.pem
-
-kubectl -n beebop create secret tls tls-secret --cert  ${DEST}/certificate.pem --key ${DEST}/key.pem
+kubectl -n beebop create secret tls tls-secret \
+    --cert <(vault read -field=cert /secret/beebop/ssl/$ENV) \
+    --key <(vault read -field=key /secret/beebop/ssl/$ENV)
