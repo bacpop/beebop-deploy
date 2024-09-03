@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
-# TODO: update to use vault k8s auth
-
 set -eu
-
+# assume already athenticated to vault
+ENV=${1:-staging}
+if [[ "$ENV" != "staging" && "$ENV" != "production" ]]; then
+    echo "Error: env must be either 'staging' or 'production'"
+    exit 1
+fi
 DEST=${PWD}/k8s/ssl
 mkdir -p $DEST 
 
-vault read -field=cert /secret/beebop/ssl/staging > \
+vault read -field=cert /secret/beebop/ssl/$ENV > \
       ${DEST}/certificate.pem
-vault read -field=key /secret/beebop/ssl/staging > \
+vault read -field=key /secret/beebop/ssl/$ENV > \
       ${DEST}/key.pem
 
 kubectl -n beebop create secret tls tls-secret --cert  ${DEST}/certificate.pem --key ${DEST}/key.pem
