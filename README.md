@@ -34,3 +34,14 @@ We have one copy of `beebop` deployed:
 * server: `beebop.dide.ic.ac.uk`
 * config: `prod.yml`
 * command to run: `./beebop start prod`
+
+### Running data migrations
+
+All data migrations are stored in the migration folder in the server. The naming convention is `YYYYMMDDHHMMSS_<migration_name>.sh`.
+
+To run them, you can use the following command from the **root**, and replace the migration file with the one you want to run:
+
+```bash
+docker exec beebop-redis bash -c "$(cat ./migrations/<migration_file>)"
+
+```
