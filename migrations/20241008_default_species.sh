@@ -9,5 +9,8 @@ projectKeys=$(redis-cli --scan | grep -E ^beebop:project:[a-zA-Z0-9]+$)
 echo "Number of found projects: $(echo "$projectKeys" | wc -w)"
 
 for key in $projectKeys; do
-    redis-cli HSET "$key" species "Streptococcus pneumoniae"
+    currentSpecies=$(redis-cli HGET "$key" species)
+    if [ -z "$currentSpecies" ]; then
+        redis-cli HSET "$key" species "Streptococcus pneumoniae"
+    fi
 done
