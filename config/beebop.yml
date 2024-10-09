@@ -21,7 +21,7 @@ api:
     repo: mrcide
     name: beebop-py
     tag: main
-  db_location: ./storage/GPS_v8_ref
+  dbs_location: ./storage/dbs
   storage_location: ./storage
 redis:
   image:
