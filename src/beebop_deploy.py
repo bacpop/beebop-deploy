@@ -170,10 +170,11 @@ def redis_configure(container, cfg):
 def api_configure(container, cfg):
     print("[api] Downloading storage database")
     args = ["./scripts/download_databases"]
-    mounts = [docker.types.Mount("/beebop/storage",
-                cfg.volumes["storage"])]
-    container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
-                                    remove=True)
+    mounts = [docker.types.Mount("/beebop/storage", cfg.volumes["storage"])]
+    container.client.containers.run(
+        str(cfg.api_ref), args, mounts=mounts, remove=True
+    )
+
 
 def server_configure(api):
     def configure(container, cfg):
