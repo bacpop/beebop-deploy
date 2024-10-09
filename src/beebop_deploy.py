@@ -173,7 +173,7 @@ def api_configure(container, cfg):
         print("[api] Storage db already exists, doing nothing")
     else:
         print("[api] Downloading storage database")
-        args = ["./scripts/download_db"]
+        args = ["./scripts/download_databases"]
         mounts = [docker.types.Mount("/beebop/storage",
                   cfg.volumes["storage"])]
         container.client.containers.run(str(cfg.api_ref), args, mounts=mounts,
