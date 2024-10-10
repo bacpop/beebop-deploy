@@ -27,7 +27,8 @@ class BeebopConfig:
         }
 
         self.volumes = {
-            "storage": "beebop_storage"
+            "storage": "beebop_storage",
+            "redis-volume": "redis-volume"
         }
 
         # redis
@@ -110,8 +111,10 @@ class BeebopConfig:
 
 def beebop_constellation(cfg):
     # 1. redis
+    redis_mounts = [constellation.ConstellationMount("redis-volume",
+                                                   "/data")]
     redis = constellation.ConstellationContainer(
-        "redis", cfg.redis_ref, configure=redis_configure)
+        "redis", cfg.redis_ref, configure=redis_configure, mounts=redis_mounts)
 
     # 2. api
     api_env = {"REDIS_HOST": redis.name,
