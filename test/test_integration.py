@@ -16,6 +16,7 @@ def test_start_beebop():
 
     assert docker_util.network_exists("beebop_nw")
     assert docker_util.volume_exists("beebop_storage")
+    assert docker_util.volume_exists("redis-volume")
     assert docker_util.container_exists("beebop-api")
     assert docker_util.container_exists("beebop-redis")
     assert docker_util.container_exists("beebop-server")
@@ -36,6 +37,7 @@ def test_start_beebop():
 
     assert not docker_util.network_exists("beebop_nw")
     assert not docker_util.volume_exists("beebop_storage")
+    assert not docker_util.volume_exists("redis-volume")
     assert not docker_util.container_exists("beebop-api")
     assert not docker_util.container_exists("beebop-redis")
     assert not docker_util.container_exists("beebop-server")
