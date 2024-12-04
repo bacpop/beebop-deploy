@@ -17,6 +17,7 @@ class BeebopConfig:
         self.vault = config.config_vault(dat, ["vault"])
         self.network = config.config_string(dat, ["docker", "network"])
         self.container_prefix = config.config_string(dat, ["docker", "prefix"])
+        self.registry = config.config_string(dat, ["docker", "registry"])
 
         self.containers = {
             "redis": "redis",
@@ -46,7 +47,7 @@ class BeebopConfig:
         proxy_tag = config.config_string(
             dat, ["proxy", "image", "tag"])
         self.proxy_ref = constellation.ImageReference(
-            proxy_repo, proxy_name, proxy_tag)
+            f"{self.registry}/{proxy_repo}", proxy_name, proxy_tag)
         self.proxy_host = config.config_string(dat, ["proxy", "host"])
         self.proxy_port_http = config.config_integer(dat,
                                                      ["proxy", "port_http"])
@@ -73,7 +74,7 @@ class BeebopConfig:
         server_tag = config.config_string(
             dat, ["server", "image", "tag"])
         self.server_ref = constellation.ImageReference(
-            server_repo, server_name, server_tag)
+            f"{self.registry}/{server_repo}", server_name, server_tag)
         self.server_port = config.config_integer(dat, ["server", "port"])
         self.client_url = config.config_string(dat, ["server", "client_url"])
         self.server_url = config.config_string(dat, ["server", "server_url"])
@@ -97,15 +98,15 @@ class BeebopConfig:
         api_tag = config.config_string(
             dat, ["api", "image", "tag"])
         self.api_ref = constellation.ImageReference(
-            api_repo, api_name, api_tag)
+            f"{self.registry}/{api_repo}", api_name, api_tag)
         self.api_storage_location = config.config_string(
             dat, ["api", "storage_location"])
         self.api_dbs_location = config.config_string(
             dat, ["api", "dbs_location"])
 
-        # worker and api always the same image
+        # worker and api aapi_repolways the same image
         self.worker_ref = constellation.ImageReference(
-            api_repo, api_name, api_tag)
+            f"{self.registry}/{api_repo}", api_name, api_tag)
         self.worker_count = config.config_integer(dat, ["worker", "count"])
 
 

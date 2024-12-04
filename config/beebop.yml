@@ -1,26 +1,27 @@
 docker:
   network: beebop_nw
   prefix: beebop
+  registry: ghcr.io
 proxy:
   host: localhost
   port_http: 80
   port_https: 443
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-proxy
-    tag: main
+    tag: poppunk-version-dev #TODO: revert to main
 server:
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-server
-    tag: main
+    tag: poppunk-version-dev #TODO: revert to main
   port: 4000
   redis_url: "redis://beebop-redis:6379"
 api:
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-py
-    tag: main
+    tag: poppunk-version-dev-dev #TODO: revert to main
   dbs_location: ./storage/dbs
   storage_location: ./storage
 redis:
