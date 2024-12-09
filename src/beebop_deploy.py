@@ -18,6 +18,7 @@ class BeebopConfig:
         self.network = config.config_string(dat, ["docker", "network"])
         self.container_prefix = config.config_string(dat, ["docker", "prefix"])
         self.registry = config.config_string(dat, ["docker", "registry"])
+        self.download_ref_dbs_only = config.config_boolean(dat, ["download_ref_dbs_only"], is_optional=True, default=False)
 
         self.containers = {
             "redis": "redis",
@@ -174,6 +175,8 @@ def redis_configure(container, cfg):
 def api_configure(container, cfg):
     print("[api] Downloading storage database")
     args = ["./scripts/download_databases"]
+    if cfg.download_ref_dbs_only:
+        args.append("--refs")
     mounts = [docker.types.Mount("/beebop/storage", cfg.volumes["storage"])]
     container.client.containers.run(
         str(cfg.api_ref), args, mounts=mounts, remove=True
