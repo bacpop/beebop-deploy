@@ -104,7 +104,7 @@ class BeebopConfig:
         self.api_dbs_location = config.config_string(
             dat, ["api", "dbs_location"])
 
-        # worker and api aapi_repolways the same image
+        # worker and api the same image
         self.worker_ref = constellation.ImageReference(
             f"{self.registry}/{api_repo}", api_name, api_tag)
         self.worker_count = config.config_integer(dat, ["worker", "count"])
