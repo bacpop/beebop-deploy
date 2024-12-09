@@ -176,7 +176,7 @@ def redis_configure(container, cfg):
 
 def api_configure(container, cfg):
     print("[api] Downloading storage database")
-    args = ["./scripts/download_databases --refs"]
+    args = ["./scripts/download_databases", "--refs"]
     # if cfg.download_ref_dbs_only:
     #     args.append("--refs")
     mounts = [docker.types.Mount("/beebop/storage", cfg.volumes["storage"])]
