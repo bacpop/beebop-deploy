@@ -18,7 +18,9 @@ class BeebopConfig:
         self.network = config.config_string(dat, ["docker", "network"])
         self.container_prefix = config.config_string(dat, ["docker", "prefix"])
         self.registry = config.config_string(dat, ["docker", "registry"])
-        self.download_ref_dbs_only = config.config_boolean(dat, ["download_ref_dbs_only"], is_optional=True, default=False)
+        self.download_ref_dbs_only = config.config_boolean(
+            dat, ["download_ref_dbs_only"], is_optional=True, default=False
+        )
 
         self.containers = {
             "redis": "redis",
