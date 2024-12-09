@@ -11,3 +11,4 @@ server:
       secret: abcd
 worker:
   count: 2
+download_ref_dbs_only: True

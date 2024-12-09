@@ -1,24 +1,25 @@
 docker:
   network: beebop_nw
   prefix: beebop
+  registry: ghcr.io
 proxy:
   host: localhost
   port_http: 80
   port_https: 443
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-proxy
     tag: main
 server:
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-server
     tag: main
   port: 4000
   redis_url: "redis://beebop-redis:6379"
 api:
   image:
-    repo: mrcide
+    repo: bacpop
     name: beebop-py
     tag: main
   dbs_location: ./storage/dbs
