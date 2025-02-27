@@ -15,10 +15,16 @@ def setup_logging():
     return logging.getLogger("migration")
 
 
-def create_backups(base_folder, logger):
+def create_backup(base_folder, logger):
     """Create backups of all output folders before migration."""
     logger.info("Creating backups of output folders...")
 
+    shutil.copytree(base_folder, base_folder + "_backup")
+    
+    logger.info("Created backup of poppunk_output")
+    
+    
+def get_output_folders(base_folder):
     # Get all valid output folders
     all_output_folders = [
         os.path.join(base_folder, item)
@@ -32,15 +38,7 @@ def create_backups(base_folder, logger):
         for folder in all_output_folders
         if os.path.exists(os.path.join(folder, "network"))
     ]
-
-    for folder_path in output_folders:
-        dest_folder = folder_path + "_backup"
-        if not os.path.exists(dest_folder):
-            shutil.copytree(folder_path, dest_folder)
-            logger.info(f"Created backup: {dest_folder}")
-
     return output_folders
-
 
 def update_redis_keys(logger):
     """Update Redis job keys to match new structure."""
@@ -179,10 +177,11 @@ def move_csv_files(network_folder, parent_folder, logger):
 
                     # Move file to visualise folder
                     visualise_folder = os.path.join(parent_folder, dir_name)
-                    shutil.move(new_fname_path, visualise_folder)
-                    logger.info(
-                        f"Moved file: {new_fname} → {visualise_folder}"
-                    )
+                    if not os.path.exists(os.path.join(visualise_folder, new_fname)):
+                        shutil.move(new_fname_path, visualise_folder)
+                        logger.info(
+                            f"Moved file: {new_fname} → {visualise_folder}"
+                        )
 
 
 def move_graphml_files(network_folder, parent_folder, logger):
@@ -198,11 +197,11 @@ def move_graphml_files(network_folder, parent_folder, logger):
             cluster_num = min(map(int, cluster_nums))
             visualise_dir = f"visualise_{cluster_num}"
             visualise_path = os.path.join(parent_folder, visualise_dir)
-
+            
             if os.path.exists(visualise_path):
                 new_fname = file.replace("network", visualise_dir)
                 new_fname_path = os.path.join(network_folder, new_fname)
-
+                
                 if not os.path.exists(new_fname_path):
                     os.rename(
                         os.path.join(network_folder, file), new_fname_path
@@ -210,8 +209,9 @@ def move_graphml_files(network_folder, parent_folder, logger):
                     logger.info(f"Renamed file: {file} → {new_fname}")
 
                 # Move file to visualise folder
-                shutil.move(new_fname_path, visualise_path)
-                logger.info(f"Moved file: {new_fname} → {visualise_path}")
+                if not os.path.exists(os.path.join(visualise_path, new_fname)):
+                    shutil.move(new_fname_path, visualise_path)
+                    logger.info(f"Moved file: {new_fname} → {visualise_path}")
 
 
 def main():
@@ -219,24 +219,27 @@ def main():
     logger = setup_logging()
     logger.info("Starting data migration script")
 
-    base_folder = "poppunk_output"
+    base_folder = "/beebop/storage/poppunk_output"
 
     # Step 1: Create backups
-    output_folders = create_backups(base_folder, logger)
+    create_backup(base_folder, logger)
+    
+    # Step 2: get output_folders
+    output_folders = get_output_folders(base_folder)
 
-    # Step 2: Update Redis keys
+    # Step 3: Update Redis keys
     update_redis_keys(logger)
 
-    # Step 3: Get all folders for processing
+    # Step 4: Get all folders for processing
     all_folders = get_all_folders(output_folders)
 
-    # Step 4: Add pruned GraphML files
+    # Step 5: Add pruned GraphML files
     add_pruned_graphmls(all_folders, logger)
 
-    # Step 5: Rename microreact to visualise
+    # Step 6: Rename microreact to visualise
     updated_all_folders = rename_microreact_to_visualise(all_folders, logger)
 
-    # Step 6: Move network files to visualise folders
+    # Step 7: Move network files to visualise folders
     move_network_files_to_visualise(updated_all_folders, logger)
 
     logger.info("Migration completed successfully")
