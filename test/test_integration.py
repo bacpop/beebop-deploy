@@ -1,43 +1,12 @@
 import json
 import requests
-import os
 import urllib3
-import ssl
+from requests.adapters import HTTPAdapter
+import time
+from requests.packages.urllib3.util.retry import Retry
 import constellation.docker_util as docker_util
 
 from src import beebop_deploy
-
-
-def make_secure_request(url):
-    """
-    Make a secure request with comprehensive SSL handling
-
-    Args:
-        url (str): The URL to make the request to
-
-    Returns:
-        Response object from requests
-    """
-    # Disable SSL warnings (use cautiously)
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-    # Create a custom SSL context
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-
-    # Create session with custom configuration
-    session = requests.Session()
-    session.verify = False  # Disable SSL verification
-
-    # Make the request
-    response = session.get(
-        url,
-        verify=False,  # Disable certificate verification
-        timeout=10,  # Add a timeout to prevent hanging
-    )
-
-    return response
 
 
 def test_start_beebop():
@@ -56,7 +25,29 @@ def test_start_beebop():
     assert docker_util.container_exists("beebop-proxy")
     assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
-    res = make_secure_request("https://localhost/api/")
+    # Disable SSL warnings since we're using self-signed certs for testing
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    # Configure session with retries
+    session = requests.Session()
+    session.verify = False
+    session.trust_env = False
+
+    # Configure retry strategy
+    retry_strategy = Retry(
+        total=5,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+
+    # Give services time to fully initialize
+    time.sleep(2)
+
+    # Make the request
+    res = session.get("https://localhost/api/")
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
