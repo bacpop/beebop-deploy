@@ -1,34 +1,10 @@
 import json
 import requests
 import os
-import urllib3
-import ssl
+
 import constellation.docker_util as docker_util
 
 from src import beebop_deploy
-
-
-def make_secure_request(url):
-    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-    # Create a custom SSL context
-    ssl_context = ssl.create_default_context()
-    ssl_context.check_hostname = False
-    ssl_context.verify_mode = ssl.CERT_NONE
-
-    # Create session with custom configuration
-    session = requests.Session()
-    session.verify = False  # Disable SSL verification
-
-    # Make the request
-    response = session.get(
-        url,
-        verify=False,  # Disable certificate verification
-        timeout=10,  # Add a timeout to prevent hanging
-    )
-
-    return response
-
 
 
 def test_start_beebop():
@@ -51,8 +27,8 @@ def test_start_beebop():
     session = requests.Session()
     session.verify = False
     session.trust_env = False
-    os.environ["CURL_CA_BUNDLE"] = ""
-    res = make_secure_request("https://localhost/api/")
+    os.environ['CURL_CA_BUNDLE'] = ""
+    res = session.get("https://localhost/api/", verify=False)
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
