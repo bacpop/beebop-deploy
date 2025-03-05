@@ -22,42 +22,34 @@ def create_backup(base_folder, logger):
     shutil.copytree(base_folder, base_folder + "_backup")
     
     logger.info("Created backup of poppunk_output")
-    
+
     
 def get_output_folders(base_folder):
-    # Get all valid output folders
-    all_output_folders = [
+    # return all old output folders(that have network folder in them)
+    return [
         os.path.join(base_folder, item)
         for item in os.listdir(base_folder)
-        if os.path.isdir(os.path.join(base_folder, item))
+        if os.path.isdir(os.path.join(base_folder, item)) and 
+        os.path.exists(os.path.join(base_folder, item, "network"))
     ]
-
-    # Filter for folders with network folder (i.e old output folders to update)
-    output_folders = [
-        folder
-        for folder in all_output_folders
-        if os.path.exists(os.path.join(folder, "network"))
-    ]
-    return output_folders
 
 def update_redis_keys(logger):
     """Update Redis job keys to match new structure."""
     logger.info("Updating Redis keys...")
     r = redis.Redis(host="beebop-redis")
 
-    # Rename the Redis key from "beebop:hash:job:microreact" to "beebop:hash:job:visualise"
+    # Copy the Redis key from "beebop:hash:job:microreact" to "beebop:hash:job:visualise"
     if r.exists("beebop:hash:job:microreact"):
         microreact_data = r.hgetall("beebop:hash:job:microreact")
         for field, value in microreact_data.items():
             r.hset("beebop:hash:job:visualise", field, value)
         logger.info(
-            "Successfully renamed key from 'beebop:hash:job:microreact' to 'beebop:hash:job:visualise'"
+            "Successfully copied key from 'beebop:hash:job:microreact' to 'beebop:hash:job:visualise'"
         )
-
     else:
         logger.info("Source key 'beebop:hash:job:microreact' does not exist")
 
-    # Rename the Redis keys for each cluster
+    # Copy the Redis keys for each cluster
     microreact_cluster_keys = r.keys("beebop:hash:job:microreact:*")
     for key in microreact_cluster_keys:
         phash = key.decode("utf-8").split(":")[-1]
@@ -65,7 +57,7 @@ def update_redis_keys(logger):
         for field, value in microreact_data.items():
             r.hset(f"beebop:hash:job:visualise:{phash}", field, value)
         # r.delete(key)  # Delete the old Redis key after renaming
-        print(f"Successfully renamed key from 'beebop:hash:job:microreact:{phash}' to 'beebop:hash:job:visualise:{phash}'")
+        print(f"Successfully copied key from 'beebop:hash:job:microreact:{phash}' to 'beebop:hash:job:visualise:{phash}'")
 
 
 def get_all_folders(output_folders):
