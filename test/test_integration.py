@@ -1,6 +1,7 @@
 import json
 import requests
 import os
+import urllib3
 
 import constellation.docker_util as docker_util
 
@@ -24,6 +25,8 @@ def test_start_beebop():
     assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
     # ignore SSL
+    # Suppress only the single warning from urllib3.
+    urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
     session = requests.Session()
     session.verify = False
     session.trust_env = False
