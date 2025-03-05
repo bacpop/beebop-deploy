@@ -9,23 +9,12 @@ from src import beebop_deploy
 
 
 def make_secure_request(url):
-    """
-    Make a secure request with comprehensive SSL handling
-
-    Args:
-        url (str): The URL to make the request to
-
-    Returns:
-        Response object from requests
-    """
-    # Disable SSL warnings (use cautiously)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-
     # Create a custom SSL context
-    # ssl_context = ssl.create_default_context()
-    # ssl_context.check_hostname = False
-    # ssl_context.verify_mode = ssl.CERT_NONE
+    ssl_context = ssl.create_default_context()
+    ssl_context.check_hostname = False
+    ssl_context.verify_mode = ssl.CERT_NONE
 
     # Create session with custom configuration
     session = requests.Session()
