@@ -1,10 +1,22 @@
 import json
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3 import PoolManager
+import ssl
 import os
 
 import constellation.docker_util as docker_util
 
 from src import beebop_deploy
+
+
+class TLSAdapter(HTTPAdapter):
+    def init_poolmanager(self, *args, **kwargs):
+        context = ssl.create_default_context()
+        context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
+        kwargs["ssl_context"] = context
+        return super().init_poolmanager(*args, **kwargs)
 
 
 def test_start_beebop():
@@ -27,8 +39,9 @@ def test_start_beebop():
     session = requests.Session()
     session.verify = False
     session.trust_env = False
-    os.environ['CURL_CA_BUNDLE'] = ""
-    res = session.get("https://localhost/api/", verify=False)
+    os.environ["CURL_CA_BUNDLE"] = ""
+    session.mount("https://", TLSAdapter())
+    res = session.get("https://localhost/api/", verify=False, timeout=5)
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
