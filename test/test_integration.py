@@ -53,7 +53,33 @@ def test_start_beebop():
     assert docker_util.container_exists("beebop-proxy")
     assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
-    test_api_endpoint()
+    # Disable SSL warnings since we're using self-signed certs for testing
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    # Configure session with retries
+    session = requests.Session()
+    session.verify = False
+    session.trust_env = False
+
+    # Configure retry strategy
+    retry_strategy = Retry(
+        total=10,
+        backoff_factor=1,
+        status_forcelist=[429, 500, 502, 503, 504],
+        allowed_methods=["HEAD", "GET", "OPTIONS"],
+    )
+    adapter = HTTPAdapter(max_retries=retry_strategy)
+    session.mount("https://", adapter)
+
+    # Give services time to fully initialize
+    time.sleep(2)
+
+    # Make the request
+    res = session.get("https://localhost/api/", verify=False)
+
+    assert res.status_code == 200
+    assert json.loads(res.content)["message"] == "Welcome to beebop!"
+
     obj.destroy()
 
     assert not docker_util.network_exists("beebop_nw")
