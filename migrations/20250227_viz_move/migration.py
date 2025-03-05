@@ -20,31 +20,34 @@ def create_backup(base_folder, logger):
     logger.info("Creating backups of output folders...")
 
     shutil.copytree(base_folder, base_folder + "_backup")
-    
+
     logger.info("Created backup of poppunk_output")
 
-    
+
 def get_output_folders(base_folder):
     # return all old output folders(that have network folder in them)
     return [
         os.path.join(base_folder, item)
         for item in os.listdir(base_folder)
-        if os.path.isdir(os.path.join(base_folder, item)) and 
-        os.path.exists(os.path.join(base_folder, item, "network"))
+        if os.path.isdir(os.path.join(base_folder, item))
+        and os.path.exists(os.path.join(base_folder, item, "network"))
     ]
+
 
 def update_redis_keys(logger):
     """Update Redis job keys to match new structure."""
     logger.info("Updating Redis keys...")
     r = redis.Redis(host="beebop-redis")
 
-    # Copy the Redis key from "beebop:hash:job:microreact" to "beebop:hash:job:visualise"
+    # Copy the Redis key from "beebop:hash:job:microreact"
+    # to "beebop:hash:job:visualise"
     if r.exists("beebop:hash:job:microreact"):
         microreact_data = r.hgetall("beebop:hash:job:microreact")
         for field, value in microreact_data.items():
             r.hset("beebop:hash:job:visualise", field, value)
         logger.info(
-            "Successfully copied key from 'beebop:hash:job:microreact' to 'beebop:hash:job:visualise'"
+            "Successfully copied key from 'beebop:hash:job:microreact' to"
+            " 'beebop:hash:job:visualise'"
         )
     else:
         logger.info("Source key 'beebop:hash:job:microreact' does not exist")
@@ -56,8 +59,11 @@ def update_redis_keys(logger):
         microreact_data = r.hgetall(key)
         for field, value in microreact_data.items():
             r.hset(f"beebop:hash:job:visualise:{phash}", field, value)
-        # r.delete(key)  # Delete the old Redis key after renaming
-        print(f"Successfully copied key from 'beebop:hash:job:microreact:{phash}' to 'beebop:hash:job:visualise:{phash}'")
+        logger.info(
+            "Successfully copied key from"
+            f" 'beebop:hash:job:microreact:{phash}' to"
+            f" 'beebop:hash:job:visualise:{phash}'"
+        )
 
 
 def get_all_folders(output_folders):
@@ -85,7 +91,8 @@ def add_pruned_graphmls(all_folders, logger):
                         new_file = os.path.join(folder_path, new_file_name)
                         if not os.path.exists(new_file):
                             logger.info(
-                                f"Copying {file} to pruned version {new_file_name}"
+                                f"Copying {file} to pruned version"
+                                f" {new_file_name}"
                             )
                             shutil.copyfile(
                                 os.path.join(folder_path, file), new_file
@@ -169,7 +176,9 @@ def move_csv_files(network_folder, parent_folder, logger):
 
                     # Move file to visualise folder
                     visualise_folder = os.path.join(parent_folder, dir_name)
-                    if not os.path.exists(os.path.join(visualise_folder, new_fname)):
+                    if not os.path.exists(
+                        os.path.join(visualise_folder, new_fname)
+                    ):
                         shutil.move(new_fname_path, visualise_folder)
                         logger.info(
                             f"Moved file: {new_fname} → {visualise_folder}"
@@ -189,11 +198,11 @@ def move_graphml_files(network_folder, parent_folder, logger):
             cluster_num = min(map(int, cluster_nums))
             visualise_dir = f"visualise_{cluster_num}"
             visualise_path = os.path.join(parent_folder, visualise_dir)
-            
+
             if os.path.exists(visualise_path):
                 new_fname = file.replace("network", visualise_dir)
                 new_fname_path = os.path.join(network_folder, new_fname)
-                
+
                 if not os.path.exists(new_fname_path):
                     os.rename(
                         os.path.join(network_folder, file), new_fname_path
@@ -215,7 +224,7 @@ def main():
 
     # Step 1: Create backups
     create_backup(base_folder, logger)
-    
+
     # Step 2: get output_folders
     output_folders = get_output_folders(base_folder)
 
