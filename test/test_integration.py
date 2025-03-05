@@ -21,34 +21,25 @@ def make_secure_request(url):
     # Disable SSL warnings (use cautiously)
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-    try:
-        # Create a custom SSL context
-        ssl_context = ssl.create_default_context()
-        ssl_context.check_hostname = False
-        ssl_context.verify_mode = ssl.CERT_NONE
 
-        # Create session with custom configuration
-        session = requests.Session()
-        session.verify = False  # Disable SSL verification
+    # Create a custom SSL context
+    # ssl_context = ssl.create_default_context()
+    # ssl_context.check_hostname = False
+    # ssl_context.verify_mode = ssl.CERT_NONE
 
-        # Make the request
-        response = session.get(
-            url,
-            verify=False,  # Disable certificate verification
-            timeout=10,  # Add a timeout to prevent hanging
-        )
+    # Create session with custom configuration
+    session = requests.Session()
+    session.verify = False  # Disable SSL verification
 
-        return response
+    # Make the request
+    response = session.get(
+        url,
+        verify=False,  # Disable certificate verification
+        timeout=10,  # Add a timeout to prevent hanging
+    )
 
-    except requests.exceptions.SSLError as ssl_error:
-        print(f"SSL Error occurred: {ssl_error}")
-        # Specific handling for SSL errors
+    return response
 
-    except requests.exceptions.RequestException as req_error:
-        print(f"Request error occurred: {req_error}")
-        # General request error handling
-
-    return None
 
 
 def test_start_beebop():
@@ -72,13 +63,7 @@ def test_start_beebop():
     session.verify = False
     session.trust_env = False
     os.environ["CURL_CA_BUNDLE"] = ""
-    try:
-        res = make_secure_request("https://localhost/api/")
-        if res:
-            print(f"Status Code: {res.status_code}")
-            print(f"Response: {res.text}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    res = make_secure_request("https://localhost/api/")
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
