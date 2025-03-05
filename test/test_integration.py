@@ -8,17 +8,7 @@ import constellation.docker_util as docker_util
 from src import beebop_deploy
 
 
-def make_secure_request(url):
-    """
-    Make a secure request with comprehensive SSL handling
-
-    Args:
-        url (str): The URL to make the request to
-
-    Returns:
-        Response object from requests
-    """
-    # Disable SSL warnings (use cautiously)
+def make_insecure_request(url):
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     # Create a custom SSL context
@@ -56,7 +46,7 @@ def test_start_beebop():
     assert docker_util.container_exists("beebop-proxy")
     assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
-    res = make_secure_request("https://localhost/api/")
+    res = make_insecure_request("https://localhost/api/")
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
