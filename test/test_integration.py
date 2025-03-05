@@ -1,9 +1,8 @@
 import json
 import requests
 import urllib3
-from requests.adapters import HTTPAdapter
+from requests.adapters import HTTPAdapter, Retry
 import time
-from requests.packages.urllib3.util.retry import Retry
 import constellation.docker_util as docker_util
 
 from src import beebop_deploy
@@ -47,7 +46,7 @@ def test_start_beebop():
     time.sleep(2)
 
     # Make the request
-    res = session.get("https://localhost/api/")
+    res = session.get("https://localhost/api/", verify=False)
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
