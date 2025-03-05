@@ -67,18 +67,10 @@ def test_start_beebop():
     assert docker_util.container_exists("beebop-proxy")
     assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
 
-    # ignore SSL
-    session = requests.Session()
-    session.verify = False
-    session.trust_env = False
-    os.environ["CURL_CA_BUNDLE"] = ""
-    try:
-        res = make_secure_request("https://localhost/api/")
-        if res:
-            print(f"Status Code: {res.status_code}")
-            print(f"Response: {res.text}")
-    except Exception as e:
-        print(f"An error occurred: {e}")
+    res = make_secure_request("https://localhost/api/")
+    if res:
+        print(f"Status Code: {res.status_code}")
+        print(f"Response: {res.text}")
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
