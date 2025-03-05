@@ -25,13 +25,13 @@ def test_api_endpoint():
         allowed_methods=["HEAD", "GET", "OPTIONS"],
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
-    session.mount("https://", adapter)
+    session.mount("http://", adapter)
 
     # Give services time to fully initialize
     time.sleep(2)
 
     # Make the request
-    res = session.get("https://localhost/api/", verify=False)
+    res = session.get("http://localhost/api/", verify=False)
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
