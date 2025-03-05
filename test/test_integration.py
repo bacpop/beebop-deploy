@@ -8,22 +8,7 @@ import constellation.docker_util as docker_util
 from src import beebop_deploy
 
 
-def test_start_beebop():
-    # use a config that doesn't involve vault secrets
-    cfg = beebop_deploy.BeebopConfig("config", "fake")
-    obj = beebop_deploy.beebop_constellation(cfg)
-    obj.status()
-    obj.start()
-
-    assert docker_util.network_exists("beebop_nw")
-    assert docker_util.volume_exists("beebop_storage")
-    assert docker_util.volume_exists("redis-volume")
-    assert docker_util.container_exists("beebop-api")
-    assert docker_util.container_exists("beebop-redis")
-    assert docker_util.container_exists("beebop-server")
-    assert docker_util.container_exists("beebop-proxy")
-    assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
-
+def test_api_endpoint():
     # Disable SSL warnings since we're using self-signed certs for testing
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
@@ -51,6 +36,24 @@ def test_start_beebop():
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
 
+
+def test_start_beebop():
+    # use a config that doesn't involve vault secrets
+    cfg = beebop_deploy.BeebopConfig("config", "fake")
+    obj = beebop_deploy.beebop_constellation(cfg)
+    obj.status()
+    obj.start()
+
+    assert docker_util.network_exists("beebop_nw")
+    assert docker_util.volume_exists("beebop_storage")
+    assert docker_util.volume_exists("redis-volume")
+    assert docker_util.container_exists("beebop-api")
+    assert docker_util.container_exists("beebop-redis")
+    assert docker_util.container_exists("beebop-server")
+    assert docker_util.container_exists("beebop-proxy")
+    assert len(docker_util.containers_matching("beebop-worker-", False)) == 2
+
+    test_api_endpoint()
     obj.destroy()
 
     assert not docker_util.network_exists("beebop_nw")
