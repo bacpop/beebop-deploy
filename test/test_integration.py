@@ -1,9 +1,8 @@
 import json
 import requests
-import os
+import time
 
 import constellation.docker_util as docker_util
-
 from src import beebop_deploy
 
 
@@ -27,8 +26,11 @@ def test_start_beebop():
     session = requests.Session()
     session.verify = False
     session.trust_env = False
-    os.environ['CURL_CA_BUNDLE'] = ""
-    res = session.get("https://localhost/api/", verify=False)
+
+    # Give services time to fully initialize
+    time.sleep(5)
+
+    res = session.get("https://localhost/api/", verify=False, timeout=5)
 
     assert res.status_code == 200
     assert json.loads(res.content)["message"] == "Welcome to beebop!"
