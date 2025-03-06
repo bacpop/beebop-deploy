@@ -11,15 +11,6 @@ from src import beebop_deploy
 import time
 
 
-class TLSAdapter(HTTPAdapter):
-    def init_poolmanager(self, *args, **kwargs):
-        context = ssl.create_default_context()
-        context.check_hostname = False
-        context.verify_mode = ssl.CERT_NONE
-        kwargs["ssl_context"] = context
-        return super().init_poolmanager(*args, **kwargs)
-
-
 def test_start_beebop():
     # use a config that doesn't involve vault secrets
     cfg = beebop_deploy.BeebopConfig("config", "fake")
@@ -40,7 +31,6 @@ def test_start_beebop():
     session = requests.Session()
     session.verify = False
     session.trust_env = False
-    session.mount("https://", TLSAdapter())
 
     # Give services time to fully initialize
     time.sleep(5)
