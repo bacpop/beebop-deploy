@@ -1,14 +1,9 @@
 import json
 import requests
-from requests.adapters import HTTPAdapter
-from urllib3 import PoolManager
-import ssl
-import os
+import time
 
 import constellation.docker_util as docker_util
-
 from src import beebop_deploy
-import time
 
 
 def test_start_beebop():
