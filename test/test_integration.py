@@ -38,12 +38,13 @@ def test_start_beebop():
 
     # ignore SSL
     session = requests.Session()
-
     session.verify = False
     session.trust_env = False
-    # os.environ["CURL_CA_BUNDLE"] = ""
     session.mount("https://", TLSAdapter())
+
+    # Give services time to fully initialize
     time.sleep(5)
+
     res = session.get("https://localhost/api/", verify=False, timeout=5)
 
     assert res.status_code == 200
