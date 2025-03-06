@@ -9,19 +9,19 @@ proxy:
   image:
     repo: bacpop
     name: beebop-proxy
-    tag: bacpop-208-nw-mc-1-call
+    tag: main
 server:
   image:
     repo: bacpop
     name: beebop-server
-    tag: bacpop-208-nw-mc-1-call
+    tag: main
   port: 4000
   redis_url: "redis://beebop-redis:6379"
 api:
   image:
     repo: bacpop
     name: beebop-py
-    tag: bacpop-208-nw-mc-1-call
+    tag: main
   dbs_location: ./storage/dbs
   storage_location: ./storage
 redis:
