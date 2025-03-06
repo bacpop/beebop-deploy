@@ -8,14 +8,12 @@ import os
 import constellation.docker_util as docker_util
 
 from src import beebop_deploy
+import time
 
 
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
-        ssl.SSLContext.verify_mode = property(
-            lambda self: ssl.CERT_NONE, lambda self, newval: None
-        )
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
         kwargs["ssl_context"] = context
@@ -45,6 +43,7 @@ def test_start_beebop():
     session.trust_env = False
     # os.environ["CURL_CA_BUNDLE"] = ""
     session.mount("https://", TLSAdapter())
+    time.sleep(5)
     res = session.get("https://localhost/api/", verify=False, timeout=5)
 
     assert res.status_code == 200
