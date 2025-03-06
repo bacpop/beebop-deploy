@@ -13,6 +13,9 @@ from src import beebop_deploy
 class TLSAdapter(HTTPAdapter):
     def init_poolmanager(self, *args, **kwargs):
         context = ssl.create_default_context()
+        ssl.SSLContext.verify_mode = property(
+            lambda self: ssl.CERT_NONE, lambda self, newval: None
+        )
         context.check_hostname = False
         context.verify_mode = ssl.CERT_NONE
         kwargs["ssl_context"] = context
@@ -37,9 +40,10 @@ def test_start_beebop():
 
     # ignore SSL
     session = requests.Session()
+
     session.verify = False
     session.trust_env = False
-    os.environ["CURL_CA_BUNDLE"] = ""
+    # os.environ["CURL_CA_BUNDLE"] = ""
     session.mount("https://", TLSAdapter())
     res = session.get("https://localhost/api/", verify=False, timeout=5)
 
