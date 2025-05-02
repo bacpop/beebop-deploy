@@ -11,7 +11,7 @@ def test_start_beebop():
     cfg = beebop_deploy.BeebopConfig("config", "fake")
     obj = beebop_deploy.beebop_constellation(cfg)
     obj.status()
-    obj.start()
+    obj.start(pull_images=True)
 
     assert docker_util.network_exists("beebop_nw")
     assert docker_util.volume_exists("beebop_storage")

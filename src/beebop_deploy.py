@@ -115,7 +115,9 @@ class BeebopConfig:
 
 def beebop_constellation(cfg):
     # 1. redis
-    redis_mounts = [constellation.ConstellationMount("redis-volume", "/data")]
+    redis_mounts = [
+        constellation.ConstellationVolumeMount("redis-volume", "/data")
+    ]
     redis = constellation.ConstellationContainer(
         "redis", cfg.redis_ref, configure=redis_configure, mounts=redis_mounts
     )
@@ -124,8 +126,8 @@ def beebop_constellation(cfg):
     api_env = {"REDIS_HOST": redis.name,
                "STORAGE_LOCATION": cfg.api_storage_location,
                "DBS_LOCATION": cfg.api_dbs_location}
-    api_mounts = [constellation.ConstellationMount("storage",
-                                                   "/beebop/storage")]
+    api_mounts = [constellation.ConstellationVolumeMount("storage",
+                                                         "/beebop/storage")]
     api = constellation.ConstellationContainer(
         "api", cfg.api_ref, environment=api_env, mounts=api_mounts,
         configure=api_configure)
@@ -136,8 +138,8 @@ def beebop_constellation(cfg):
 
     # 4. worker
     worker_env = {"REDIS_HOST": redis.name}
-    worker_mounts = [constellation.ConstellationMount("storage",
-                                                      "/beebop/storage")]
+    worker_mounts = [constellation.ConstellationVolumeMount("storage",
+                                                            "/beebop/storage")]
     # Constellation starts containers on no network, then joins them to
     # the network. So we get the container to sleep for 5s to allow for it
     # to have joined the network by the time rqworker is called, otherwise
