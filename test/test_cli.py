@@ -34,7 +34,7 @@ def test_cli_parse():
 
 def test_args_passed_to_start(monkeypatch):
     with mock.patch('src.beebop_cli.beebop_start') as f:
-        with mock.patch('src.beebop_deploy.vault_resolve_secrets') as g:
+        with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
             beebop_cli.main(["start", "prod"])
 
     assert f.called
@@ -42,7 +42,7 @@ def test_args_passed_to_start(monkeypatch):
     assert g.called
 
     with mock.patch('src.beebop_cli.beebop_start') as f:
-        with mock.patch('src.beebop_deploy.vault_resolve_secrets') as g:
+        with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
             beebop_cli.main(["start", "prod", "--pull"])
 
     assert f.called
