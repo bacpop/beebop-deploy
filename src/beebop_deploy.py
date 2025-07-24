@@ -99,7 +99,7 @@ class BeebopConfig:
 
         # acme
 
-        if (use_acme):
+        if self.use_acme:
             acme_repo = config.config_string(
                 dat, ["acme_buddy", "image", "repo"])
             acme_name = config.config_string(
