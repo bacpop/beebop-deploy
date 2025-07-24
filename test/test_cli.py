@@ -33,9 +33,17 @@ def test_cli_parse():
 
 
 def test_args_passed_to_start():
+  
+    original_constellation = beebop_cli.beebop_constellation
+
+    def patched_constellation(cfg):
+        obj = original_constellation(cfg)
+        obj.vault.client = mock.Mock(return_value="fake_client")
+        return obj
+
     with mock.patch('src.beebop_cli.beebop_start') as f:
         with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
-            with mock.patch('src.beebop_deploy.cfg.vault.client', return_value="fake_client"):
+            with mock.patch('src.beebop_cli.beebop_constellation', side_effect=patched_constellation):
                 beebop_cli.main(["start", "prod"])
                 assert g.called
         assert f.called
@@ -44,7 +52,7 @@ def test_args_passed_to_start():
 
     with mock.patch('src.beebop_cli.beebop_start') as f:
         with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
-            with mock.patch('src.beebop_deploy.cfg.vault.client', return_value="fake_client"):
+            with mock.patch('src.beebop_cli.beebop_constellation', side_effect=patched_constellation):
                 beebop_cli.main(["start", "prod", "--pull"])
                 assert g.called
         assert f.called
