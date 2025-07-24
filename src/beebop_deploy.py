@@ -29,7 +29,7 @@ class BeebopConfig:
             "proxy": "proxy",
             "worker": "worker"
         }
-        
+
         self.use_acme = "acme_buddy" in dat
 
         self.volumes = {
@@ -116,8 +116,6 @@ class BeebopConfig:
             self.acme_buddy_port = config.config_integer(
                 dat, ["acme_buddy", "port"])
 
-            
-
         # worker and api the same image
         self.worker_ref = constellation.ImageReference(
             f"{self.registry}/{api_repo}", api_name, api_tag)
@@ -182,7 +180,9 @@ def beebop_constellation(cfg):
         }
         acme_mounts = [
             constellation.ConstellationVolumeMount("beebop-tls", "/tls"),
-            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
+            constellation.ConstellationBindMount(
+                "/var/run/docker.sock", 
+                "/var/run/docker.sock"),
         ]
 
         acme = constellation.ConstellationContainer(
@@ -209,7 +209,8 @@ def beebop_constellation(cfg):
             ],
         )
 
-    containers = [redis, server, api, proxy, worker] + ([acme] if cfg.use_acme else [])
+    containers = [redis, server, api, proxy, worker] + \
+                 ([acme] if cfg.use_acme else [])
 
     obj = constellation.Constellation("beebop", cfg.container_prefix,
                                       containers,
