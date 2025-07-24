@@ -32,19 +32,18 @@ def test_cli_parse():
     assert beebop_cli.parse(["upgrade"]) == ("config", None, "upgrade", {}, {})
 
 
-def test_args_passed_to_start(monkeypatch):
+def test_args_passed_to_start():
     with mock.patch('src.beebop_cli.beebop_start') as f:
         with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
             beebop_cli.main(["start", "prod"])
+            assert g.called
+        assert f.called
+        assert f.call_args[0][1] == {"pull_images": False}
 
-    assert f.called
-    assert f.call_args[0][1] == {"pull_images": False}
-    assert g.called
 
     with mock.patch('src.beebop_cli.beebop_start') as f:
         with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
             beebop_cli.main(["start", "prod", "--pull"])
-
-    assert f.called
-    assert f.call_args[0][1] == {"pull_images": True}
-    assert g.called
+            assert g.called
+        assert f.called
+        assert f.call_args[0][1] == {"pull_images": True}
