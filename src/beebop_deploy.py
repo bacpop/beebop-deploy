@@ -113,7 +113,7 @@ class BeebopConfig:
                 dat, ["acme_buddy", "hdb_username"])
             self.acme_buddy_hdb_password = config.config_string(
                 dat, ["acme_buddy", "hdb_password"])
-            self.acme_buddy_port = config.config_string(
+            self.acme_buddy_port = config.config_integer(
                 dat, ["acme_buddy", "port"])
 
             
@@ -264,7 +264,7 @@ def server_configure(api):
 
 def proxy_configure(container, cfg):
     print("[proxy] Configuring proxy")
-    if not "acme_buddy" in cfg:
+    if not cfg.use_acme:
         print("Generating self-signed certificates for proxy")
         args = ["/usr/local/bin/build-self-signed-certificate", "/run/proxy",
                 "GB", "London", "IC", "bacpop", cfg.proxy_host]
