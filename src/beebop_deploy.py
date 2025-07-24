@@ -97,6 +97,26 @@ class BeebopConfig:
         self.api_dbs_location = config.config_string(
             dat, ["api", "dbs_location"])
 
+        # acme
+
+        if (use_acme):
+            acme_repo = config.config_string(
+                dat, ["acme_buddy", "image", "repo"])
+            acme_name = config.config_string(
+                dat, ["acme_buddy", "image", "name"])
+            acme_tag = config.config_string(
+                dat, ["acme_buddy", "image", "tag"])
+            self.acme_buddy_ref = constellation.ImageReference(
+                f"{self.registry}/{acme_repo}", acme_name, acme_tag)
+            self.acme_buddy_hdb_username = config.config_string(
+                dat, ["acme", "hdb_username"])
+            self.acme_buddy_hdb_password = config.config_string(
+                dat, ["acme", "hdb_password"])
+            self.acme_buddy_port = config.config_string(
+                dat, ["acme", "port"])
+
+            
+
         # worker and api the same image
         self.worker_ref = constellation.ImageReference(
             f"{self.registry}/{api_repo}", api_name, api_tag)
