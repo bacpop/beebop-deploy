@@ -29,6 +29,8 @@ class BeebopConfig:
             "proxy": "proxy",
             "worker": "worker"
         }
+        
+        self.use_acme = "acme_buddy" in dat
 
         self.volumes = {
             "storage": "beebop_storage",
