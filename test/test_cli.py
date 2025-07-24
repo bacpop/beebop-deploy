@@ -32,8 +32,8 @@ def test_cli_parse():
     assert beebop_cli.parse(["upgrade"]) == ("config", None, "upgrade", {}, {})
 
 
-def test_args_passed_to_start():
-    os.environ["VAULT_GITHUB_AUTH_TOKEN"] = "abcde"
+def test_args_passed_to_start(monkeypatch):
+    monkeypatch.setenv("VAULT_GITHUB_AUTH_TOKEN", "abcde")
     with mock.patch('src.beebop_cli.beebop_start') as f:
         beebop_cli.main(["start", "prod"])
 
