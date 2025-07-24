@@ -1,4 +1,5 @@
 import io
+import os
 import pytest
 import string
 
@@ -32,6 +33,7 @@ def test_cli_parse():
 
 
 def test_args_passed_to_start():
+    os.environ["VAULT_GITHUB_AUTH_TOKEN"] = "abcde"
     with mock.patch('src.beebop_cli.beebop_start') as f:
         beebop_cli.main(["start", "prod"])
 
