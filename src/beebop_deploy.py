@@ -6,6 +6,7 @@ import json
 import constellation
 import constellation.config as config
 import constellation.docker_util as docker_util
+from constellation import vault
 
 
 class BeebopConfig:
@@ -123,6 +124,8 @@ class BeebopConfig:
 
 
 def beebop_constellation(cfg):
+    vault.resolve_secrets(cfg, cfg.vault.client())
+
     # 1. redis
     redis_mounts = [
         constellation.ConstellationVolumeMount("redis-volume", "/data")
