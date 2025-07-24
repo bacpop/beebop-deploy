@@ -56,18 +56,6 @@ class BeebopConfig:
                                                      ["proxy", "port_http"])
         self.proxy_port_https = config.config_integer(dat,
                                                       ["proxy", "port_https"])
-        if "ssl" in dat["proxy"]:
-            self.proxy_ssl_certificate = config.config_string(dat,
-                                                              ["proxy",
-                                                               "ssl",
-                                                               "certificate"])
-            self.proxy_ssl_key = config.config_string(dat,
-                                                      ["proxy",
-                                                       "ssl",
-                                                       "key"])
-            self.ssl = True
-        else:
-            self.ssl = False
 
         # server
         server_repo = config.config_string(
@@ -151,12 +139,54 @@ def beebop_constellation(cfg):
 
     # 5. proxy
     proxy_ports = [cfg.proxy_port_http, cfg.proxy_port_https]
+    proxy_mounts = [
+        constellation.ConstellationVolumeMount("beebop-tls", "/run/proxy"),
+    ]
     proxy = constellation.ConstellationContainer(
         "proxy", cfg.proxy_ref, ports=proxy_ports, configure=proxy_configure,
+        mounts=proxy_mounts,
         args=[cfg.proxy_host,
               server.name])
 
-    containers = [redis, server, api, proxy, worker]
+    # 6. acme-buddy
+
+    if cfg.use_acme:
+        acme_buddy_staging = os.environ.get("ACME_BUDDY_STAGING", 0)
+        acme_env = {
+            "ACME_BUDDY_STAGING": acme_buddy_staging,
+            "HDB_ACME_USERNAME": cfg.acme_buddy_hdb_username,
+            "HDB_ACME_PASSWORD": cfg.acme_buddy_hdb_password,
+        }
+        acme_mounts = [
+            constellation.ConstellationVolumeMount("beebop-tls", "/tls"),
+            constellation.ConstellationBindMount("/var/run/docker.sock", "/var/run/docker.sock"),
+        ]
+
+        acme = constellation.ConstellationContainer(
+            "acme-buddy",
+            cfg.acme_buddy_ref,
+            ports=[cfg.acme_buddy_port],
+            mounts=acme_mounts,
+            environment=acme_env,
+            args=[
+                "--domain",
+                cfg.proxy_host,
+                "--email",
+                "reside@imperial.ac.uk",
+                "--dns-provider",
+                "hdb",
+                "--certificate-path",
+                "/tls/certificate.pem",
+                "--key-path",
+                "/tls/key.pem",
+                "--account-path",
+                "/tls/account.json",
+                "--reload-container",
+                proxy.name_external(cfg.container_prefix),
+            ],
+        )
+
+    containers = [redis, server, api, proxy, worker] + ([acme] if cfg.use_acme else [])
 
     obj = constellation.Constellation("beebop", cfg.container_prefix,
                                       containers,
@@ -211,13 +241,7 @@ def server_configure(api):
 
 def proxy_configure(container, cfg):
     print("[proxy] Configuring proxy")
-    if cfg.ssl:
-        print("Copying ssl certificate and key into proxy")
-        docker_util.string_into_container(cfg.proxy_ssl_certificate, container,
-                                          "/run/proxy/certificate.pem")
-        docker_util.string_into_container(cfg.proxy_ssl_key, container,
-                                          "/run/proxy/key.pem")
-    else:
+    if not "acme_buddy" in cfg:
         print("Generating self-signed certificates for proxy")
         args = ["/usr/local/bin/build-self-signed-certificate", "/run/proxy",
                 "GB", "London", "IC", "bacpop", cfg.proxy_host]
