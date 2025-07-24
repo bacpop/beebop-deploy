@@ -33,7 +33,7 @@ def test_cli_parse():
 
 
 def test_args_passed_to_start(monkeypatch):
-    monkeypatch.setenv("VAULT_GITHUB_AUTH_TOKEN", "abcde")
+    monkeypatch.setenv("VAULT_AUTH_GITHUB_TOKEN", "abcde")
     with mock.patch('src.beebop_cli.beebop_start') as f:
         beebop_cli.main(["start", "prod"])
 
