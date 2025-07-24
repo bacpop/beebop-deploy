@@ -35,6 +35,7 @@ class BeebopConfig:
         self.volumes = {
             "storage": "beebop_storage",
             "redis-volume": "redis-volume",
+            "beebop-tls": "beebop-tls"
         }
 
         # redis
@@ -109,11 +110,11 @@ class BeebopConfig:
             self.acme_buddy_ref = constellation.ImageReference(
                 f"{self.registry}/{acme_repo}", acme_name, acme_tag)
             self.acme_buddy_hdb_username = config.config_string(
-                dat, ["acme", "hdb_username"])
+                dat, ["acme_buddy", "hdb_username"])
             self.acme_buddy_hdb_password = config.config_string(
-                dat, ["acme", "hdb_password"])
+                dat, ["acme_buddy", "hdb_password"])
             self.acme_buddy_port = config.config_string(
-                dat, ["acme", "port"])
+                dat, ["acme_buddy", "port"])
 
             
 
