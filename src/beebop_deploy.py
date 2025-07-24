@@ -181,7 +181,7 @@ def beebop_constellation(cfg):
         acme_mounts = [
             constellation.ConstellationVolumeMount("beebop-tls", "/tls"),
             constellation.ConstellationBindMount(
-                "/var/run/docker.sock", 
+                "/var/run/docker.sock",
                 "/var/run/docker.sock"),
         ]
 
@@ -210,7 +210,7 @@ def beebop_constellation(cfg):
         )
 
     containers = [redis, server, api, proxy, worker] + \
-                 ([acme] if cfg.use_acme else [])
+        ([acme] if cfg.use_acme else [])
 
     obj = constellation.Constellation("beebop", cfg.container_prefix,
                                       containers,
