@@ -33,12 +33,14 @@ def test_cli_parse():
 
 
 def test_args_passed_to_start(monkeypatch):
-    monkeypatch.setenv("VAULT_AUTH_GITHUB_TOKEN", "abcde")
     with mock.patch('src.beebop_cli.beebop_start') as f:
-        beebop_cli.main(["start", "prod"])
+        with mock.patch('src.beebop_deploy.vault.resolve_secrets') as g:
+            beebop_cli.main(["start", "prod"])
 
     assert f.called
     assert f.call_args[0][1] == {"pull_images": False}
+
+    assert g.called
 
     with mock.patch('src.beebop_cli.beebop_start') as f:
         beebop_cli.main(["start", "prod", "--pull"])
