@@ -1,8 +1,5 @@
 proxy:
   host: beebop-dev.dide.ic.ac.uk
-  ssl:
-    certificate: VAULT:secret/beebop/ssl/staging:cert
-    key: VAULT:secret/beebop/ssl/staging:key
 server:
   client_url: https://beebop-dev.dide.ic.ac.uk
   server_url: https://beebop-dev.dide.ic.ac.uk/api
@@ -18,3 +15,11 @@ vault:
   addr: https://vault.dide.ic.ac.uk:8200
   auth:
     method: github
+acme_buddy:
+  image:
+    repo: reside-ic
+    name: acme-buddy
+    tag: latest
+  hdb_username: VAULT:secret/certbot-hdb/credentials:username
+  hdb_password: VAULT:secret/certbot-hdb/credentials:password
+  port: 2112

@@ -33,13 +33,13 @@ def test_cli_parse():
 
 def test_args_passed_to_start():
     with mock.patch('src.beebop_cli.beebop_start') as f:
-        beebop_cli.main(["start", "prod"])
+        beebop_cli.main(["start", "fake"])
 
     assert f.called
     assert f.call_args[0][1] == {"pull_images": False}
 
     with mock.patch('src.beebop_cli.beebop_start') as f:
-        beebop_cli.main(["start", "prod", "--pull"])
+        beebop_cli.main(["start", "fake", "--pull"])
 
     assert f.called
     assert f.call_args[0][1] == {"pull_images": True}
