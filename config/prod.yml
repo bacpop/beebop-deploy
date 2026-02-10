@@ -1,6 +1,7 @@
 proxy:
   host: beebop.dide.ic.ac.uk
 server:
+  node_options: "--max-old-space-size=8192"
   client_url: https://beebop.dide.ic.ac.uk
   server_url: https://beebop.dide.ic.ac.uk/api
   auth:

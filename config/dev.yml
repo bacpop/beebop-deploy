@@ -1,4 +1,5 @@
 server:
+  node_options: "--max-old-space-size=8192"
   client_url: https://localhost
   server_url: https://localhost/api
   auth:
