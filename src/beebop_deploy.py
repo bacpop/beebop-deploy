@@ -149,7 +149,12 @@ def beebop_constellation(cfg):
     # 3. server
     server_env = {"NODE_OPTIONS": cfg.server_node_options}
     server = constellation.ConstellationContainer(
-        "server", cfg.server_ref, environment=server_env, configure=server_configure(api), args=["--restart", "always"])
+        "server",
+        cfg.server_ref,
+        environment=server_env,
+        configure=server_configure(api),
+        args=["--restart", "always"],
+    )
 
     # 4. worker
     worker_env = {"REDIS_HOST": redis.name}
