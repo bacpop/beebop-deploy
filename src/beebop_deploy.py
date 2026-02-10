@@ -74,6 +74,8 @@ class BeebopConfig:
         self.client_url = config.config_string(dat, ["server", "client_url"])
         self.server_url = config.config_string(dat, ["server", "server_url"])
         self.redis_url = config.config_string(dat, ["server", "redis_url"])
+        self.server_node_options = config.config_string(
+            dat, ["server", "node_options"], is_optional=True, default="")
         self.google_client_id = config.config_string(
             dat, ["server", "auth", "google", "client_id"])
         self.google_client_secret = config.config_string(
@@ -145,8 +147,14 @@ def beebop_constellation(cfg):
         configure=api_configure)
 
     # 3. server
+    server_env = {"NODE_OPTIONS": cfg.server_node_options}
     server = constellation.ConstellationContainer(
-        "server", cfg.server_ref, configure=server_configure(api))
+        "server",
+        cfg.server_ref,
+        environment=server_env,
+        configure=server_configure(api),
+        args=["--restart", "always"],
+    )
 
     # 4. worker
     worker_env = {"REDIS_HOST": redis.name}

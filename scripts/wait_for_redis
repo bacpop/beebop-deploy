@@ -17,9 +17,9 @@ wait_for()
     return $result
 }
 
-# The variable expansion below is 20s by default, or the argument provided
+# The variable expansion below is 30s by default, or the argument provided
 # to this script
-TIMEOUT="${1:-20}"
+TIMEOUT="${1:-30}"
 wait_for
 RESULT=$?
 if [[ $RESULT -ne 0 ]]; then
